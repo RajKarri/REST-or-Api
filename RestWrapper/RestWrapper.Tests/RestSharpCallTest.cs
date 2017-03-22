@@ -39,6 +39,6 @@ namespace RestWrapper.Tests
 
             Assert.IsNotNull(response1);
             Assert.IsNotNull(response2);
-        }        
+        }
     }
 }
