@@ -21,10 +21,10 @@ namespace RestWrapper
             return response;
         }
 
-        public static string Make(IDictionary<string, string> parameters = null, IDictionary<string, string> queryParameters = null,
-                                  string header = null, string jsonBody = null, object jsonModel = null, string token = null)
+        public static string Make(IDictionary<string, string> parameters = null, IDictionary<string, string> urlSegments = null,
+                                                IDictionary<string, object> models = null, string header = null, string jsonBody = null, string token = null)
         {
-            MakeRequest(parameters, queryParameters, header, jsonBody, jsonModel, token);
+            MakeRequest(parameters, urlSegments, models, jsonBody, header, token);
             string response = Make();
             return response;
         }
@@ -35,17 +35,17 @@ namespace RestWrapper
             return response.Data;
         }
 
-        public static TResponse Make<TResponse>(IDictionary<string, string> parameters = null, IDictionary<string, string> queryParameters = null,
-                                                string header = null, string jsonBody = null, object jsonModel = null, string token = null)
+        public static TResponse Make<TResponse>(IDictionary<string, string> parameters = null, IDictionary<string, string> urlSegments = null,
+                                                IDictionary<string, object> models = null, string header = null, string jsonBody = null, string token = null)
                                                 where TResponse : class, new()
         {
-            MakeRequest(parameters, queryParameters, header, jsonBody, jsonModel, token);
+            MakeRequest(parameters, urlSegments, models, jsonBody, header, token);
             TResponse response = Execute<TResponse>().Data;
             return response;
         }
 
-        private static void MakeRequest(IDictionary<string, string> parameters, IDictionary<string, string> queryParameters, 
-                                        string header, string jsonBody, object jSonModel, string token)
+        private static void MakeRequest(IDictionary<string, string> parameters, IDictionary<string, string> urlSegments,
+                                        IDictionary<string, object> models, string jsonBody, string header, string token)
         {
             if (parameters != null)
             {
@@ -55,17 +55,21 @@ namespace RestWrapper
                 }
             }
 
-            if (queryParameters != null)
+            if (urlSegments != null)
             {
-                foreach (KeyValuePair<string, string> param in queryParameters)
+                foreach (KeyValuePair<string, string> segment in urlSegments)
                 {
-                    request.AddQueryParameter(param.Key, param.Value);
+                    request.AddUrlSegment(segment.Key, segment.Value);
                 }
             }
 
-            if (!string.IsNullOrEmpty(header))
+            if (models != null)
             {
-                request.AddHeader("header", header);
+                foreach (KeyValuePair<string, object> model in models)
+                {
+                    var json = request.JsonSerializer.Serialize(model);
+                    request.AddParameter(model.Key, json);
+                }
             }
 
             if (!string.IsNullOrEmpty(jsonBody))
@@ -73,10 +77,9 @@ namespace RestWrapper
                 request.AddJsonBody(jsonBody);
             }
 
-            if (jSonModel != null)
+            if (!string.IsNullOrEmpty(header))
             {
-                var json = request.JsonSerializer.Serialize(jSonModel);
-                request.AddParameter("application/json; charset=utf-8", json, ParameterType.RequestBody);
+                request.AddHeader("header", header);
             }
 
             if (!string.IsNullOrEmpty(token))

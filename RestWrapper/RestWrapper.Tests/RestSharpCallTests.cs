@@ -34,16 +34,11 @@ namespace RestWrapper.Tests
                 {"since", "135" }
             };
 
-            var response1 = RestSharpCall.Make(null, parameters);
-            var response2 = RestSharpCall.Make<object>(null, parameters);
-
-            var response3 = RestSharpCall.Make(parameters, null);
-            var response4 = RestSharpCall.Make<object>(parameters, null);
+            var response1 = RestSharpCall.Make(parameters);
+            var response2 = RestSharpCall.Make<object>(parameters);
 
             Assert.IsNotNull(response1);
             Assert.IsNotNull(response2);
-            Assert.IsNotNull(response3);
-            Assert.IsNotNull(response4);
-        }
+        }        
     }
 }
