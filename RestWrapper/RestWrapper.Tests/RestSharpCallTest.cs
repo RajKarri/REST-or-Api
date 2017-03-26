@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RestSharp;
+using RestWrapper;
 
 namespace RestWrapper.Tests
 {
@@ -10,7 +10,7 @@ namespace RestWrapper.Tests
         [TestMethod]
         public void GitHubUserTest1()
         {
-            RestSharpCall.Init("https://api.github.com/users/rajkarri", Method.GET);
+            RestSharpCall.Init("https://api.github.com/users/rajkarri", RestSharpMethod.GET);
 
             var response1 = RestSharpCall.Make();
             var response2 = RestSharpCall.Make<object>();
@@ -27,7 +27,7 @@ namespace RestWrapper.Tests
         [TestMethod]
         public void GitHubUserTest2()
         {
-            RestSharpCall.Init("https://api.github.com/users", Method.GET);
+            RestSharpCall.Init("https://api.github.com/users", RestSharpMethod.GET);
 
             IDictionary<string, string> parameters = new Dictionary<string, string>()
             {
