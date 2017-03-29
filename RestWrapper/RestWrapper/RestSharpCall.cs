@@ -39,15 +39,15 @@ namespace RestWrapper
         /// <summary>
         /// Method to make REST call for string response
         /// </summary>
-        /// <returns>String response</returns>
-        public static string Make()
+        /// <returns>Object response</returns>
+        public static object Make()
         {
-            string response = Execute();
-            return response;
+            IRestResponse<object> response = Execute();
+            return JsonConvert.DeserializeObject<object>(response.Content);
         }
 
         /// <summary>
-        /// Method to make Rest call for string response
+        /// Method to make REST call for string response
         /// </summary>
         /// <param name="parameters">Query string parameters</param>
         /// <param name="urlSegments">Url segments</param>
@@ -55,8 +55,8 @@ namespace RestWrapper
         /// <param name="objectForUri">Object for uri</param>
         /// <param name="objectForBody">Object for body</param>
         /// <param name="objectForJsonBody">Object for JSON body</param>
-        /// <returns>String response</returns>
-        public static string Make(
+        /// <returns>Object response</returns>
+        public static object Make(
                              IDictionary<string, string> parameters = null,
                              IDictionary<string, string> urlSegments = null,
                              IDictionary<string, string> headers = null,
@@ -64,8 +64,41 @@ namespace RestWrapper
                              object objectForBody = null,
                              object objectForJsonBody = null)
         {
-            CreateRequest(parameters, urlSegments, headers, objectForUri, objectForBody, objectForJsonBody);
-            string response = Make();
+            SetRequest(parameters, urlSegments, headers, objectForUri, objectForBody, objectForJsonBody);
+            object response = Make();
+            return response;
+        }
+
+        /// <summary>
+        /// Method to make async REST call for string response
+        /// </summary>
+        /// <returns>Object response</returns>
+        public static object MakeAsync()
+        {
+            IRestResponse<object> response = ExecuteAsync();
+            return JsonConvert.DeserializeObject<object>(response.Content);
+        }
+
+        /// <summary>
+        /// Method to make async REST call for string response
+        /// </summary>
+        /// <param name="parameters">Query string parameters</param>
+        /// <param name="urlSegments">Url segments</param>
+        /// <param name="headers">Headers for the request</param>
+        /// <param name="objectForUri">Object for uri</param>
+        /// <param name="objectForBody">Object for body</param>
+        /// <param name="objectForJsonBody">Object for JSON body</param>
+        /// <returns>Object response</returns>
+        public static object MakeAsync(
+                             IDictionary<string, string> parameters = null,
+                             IDictionary<string, string> urlSegments = null,
+                             IDictionary<string, string> headers = null,
+                             object objectForUri = null,
+                             object objectForBody = null,
+                             object objectForJsonBody = null)
+        {
+            SetRequest(parameters, urlSegments, headers, objectForUri, objectForBody, objectForJsonBody);
+            object response = MakeAsync();
             return response;
         }
 
@@ -74,14 +107,14 @@ namespace RestWrapper
         /// </summary>
         /// <typeparam name="TResponse">Response object type</typeparam>
         /// <returns>Object response</returns>
-        public static TResponse Make<TResponse>() where TResponse : class, new()
+        public static TResponse Make<TResponse>() where TResponse : new()
         {
-            IRestResponse<TResponse> response = Execute<TResponse>();
+            IRestResponse<object> response = Execute();
             return JsonConvert.DeserializeObject<TResponse>(response.Content);
         }
 
         /// <summary>
-        /// Method to make Rest call for object response
+        /// Method to make REST call for object response
         /// </summary>
         /// <param name="parameters">Query string parameters</param>
         /// <param name="urlSegments">Url segments</param>
@@ -93,15 +126,51 @@ namespace RestWrapper
         /// <returns>Object response</returns>
         public static TResponse Make<TResponse>(
                                 IDictionary<string, string> parameters = null,
-                                IDictionary<string, string> urlSegments = null, 
+                                IDictionary<string, string> urlSegments = null,
                                 IDictionary<string, string> headers = null,
                                 object objectForUri = null,
                                 object objectForBody = null,
                                 object objectForJsonBody = null)
-                                where TResponse : class, new()
+                                where TResponse : new()
         {
-            CreateRequest(parameters, urlSegments, headers, objectForUri, objectForBody, objectForJsonBody);
-            TResponse response = JsonConvert.DeserializeObject<TResponse>(Execute<TResponse>().Content);
+            SetRequest(parameters, urlSegments, headers, objectForUri, objectForBody, objectForJsonBody);
+            TResponse response = Make<TResponse>();
+            return response;
+        }
+
+        /// <summary>
+        /// Method to make async REST call for object response
+        /// </summary>
+        /// <typeparam name="TResponse">Response object type</typeparam>
+        /// <returns>Object response</returns>
+        public static TResponse MakeAsync<TResponse>() where TResponse : new()
+        {
+            IRestResponse<object> response = ExecuteAsync();
+            return JsonConvert.DeserializeObject<TResponse>(response.Content);
+        }
+
+        /// <summary>
+        /// Method to make async REST call for object response
+        /// </summary>
+        /// <param name="parameters">Query string parameters</param>
+        /// <param name="urlSegments">Url segments</param>
+        /// <param name="headers">Headers for the request</param>
+        /// <param name="objectForUri">Object for uri</param>
+        /// <param name="objectForBody">Object for body</param>
+        /// <param name="objectForJsonBody">Object for JSON body</param>
+        /// <typeparam name="TResponse">Response object type</typeparam>
+        /// <returns>Object response</returns>
+        public static TResponse MakeAsync<TResponse>(
+                                IDictionary<string, string> parameters = null,
+                                IDictionary<string, string> urlSegments = null,
+                                IDictionary<string, string> headers = null,
+                                object objectForUri = null,
+                                object objectForBody = null,
+                                object objectForJsonBody = null)
+                                where TResponse : new()
+        {
+            SetRequest(parameters, urlSegments, headers, objectForUri, objectForBody, objectForJsonBody);
+            TResponse response = MakeAsync<TResponse>();
             return response;
         }
 
@@ -114,7 +183,7 @@ namespace RestWrapper
         /// <param name="objectForUri">Object for uri</param>
         /// <param name="objectForBody">Object for body</param>
         /// <param name="objectForJsonBody">Object for JSON body</param>
-        private static void CreateRequest(
+        private static void SetRequest(
                             IDictionary<string, string> parameters,
                             IDictionary<string, string> urlSegments,
                             IDictionary<string, string> headers,
@@ -165,9 +234,8 @@ namespace RestWrapper
         /// <summary>
         /// Helper method to execute request
         /// </summary>
-        /// <typeparam name="TResponse">Response object type</typeparam>
         /// <returns>Object response</returns>
-        private static IRestResponse<TResponse> Execute<TResponse>() where TResponse : class, new()
+        private static IRestResponse<object> Execute()
         {
             try
             {
@@ -176,7 +244,7 @@ namespace RestWrapper
                     throw new Exception("Initialize method call must happen before this call");
                 }
 
-                IRestResponse<TResponse> response = client.Execute<TResponse>(request);
+                IRestResponse<object> response = client.Execute<object>(request);
                 return response;
             }
             catch (Exception ex)
@@ -186,10 +254,10 @@ namespace RestWrapper
         }
 
         /// <summary>
-        /// Helper method to execute request
+        /// Helper method to execute request async
         /// </summary>
-        /// <returns>String response</returns>
-        private static string Execute()
+        /// <returns>Object response</returns>
+        private static IRestResponse<object> ExecuteAsync()
         {
             try
             {
@@ -198,8 +266,8 @@ namespace RestWrapper
                     throw new Exception("Initialize method call must happen before this call");
                 }
 
-                IRestResponse response = client.Execute(request);
-                return response.Content;
+                var response = client.ExecuteTaskAsync<object>(request);
+                return response.Result;
             }
             catch (Exception ex)
             {

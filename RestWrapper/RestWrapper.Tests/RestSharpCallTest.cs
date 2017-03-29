@@ -23,15 +23,21 @@ namespace RestWrapper.Tests
             RestSharpCall.Init("https://api.github.com/users/rajkarri", RestSharpMethod.GET);
 
             var response1 = RestSharpCall.Make();
-            var response2 = RestSharpCall.Make<object>();
+            var response2 = RestSharpCall.MakeAsync();
+            var response3 = RestSharpCall.Make<object>();
+            var response4 = RestSharpCall.MakeAsync<object>();
 
-            var response3 = RestSharpCall.Make(null);
-            var response4 = RestSharpCall.Make<object>(null);
+            var response5 = RestSharpCall.Make(null);
+            var response6 = RestSharpCall.MakeAsync(null);
+            var response7 = RestSharpCall.Make<object>(null);
+            var response8 = RestSharpCall.MakeAsync<object>(null);
 
             Assert.IsNotNull(response1);
             Assert.IsNotNull(response2);
             Assert.IsNotNull(response3);
             Assert.IsNotNull(response4);
+            Assert.IsNotNull(response5);
+            Assert.IsNotNull(response6);
         }
 
         /// <summary>
@@ -48,10 +54,14 @@ namespace RestWrapper.Tests
             };
 
             var response1 = RestSharpCall.Make(parameters);
-            var response2 = RestSharpCall.Make<object>(parameters);
+            var response2 = RestSharpCall.MakeAsync(parameters);
+            var response3 = RestSharpCall.Make<object>(parameters);
+            var response4 = RestSharpCall.MakeAsync<object>(parameters);
 
             Assert.IsNotNull(response1);
             Assert.IsNotNull(response2);
+            Assert.IsNotNull(response3);
+            Assert.IsNotNull(response4);
         }
     }
 }
