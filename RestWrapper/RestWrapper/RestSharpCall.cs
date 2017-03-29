@@ -77,7 +77,7 @@ namespace RestWrapper
         public static TResponse Make<TResponse>() where TResponse : class, new()
         {
             IRestResponse<TResponse> response = Execute<TResponse>();
-            return response.Data;
+            return JsonConvert.DeserializeObject<TResponse>(response.Content);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace RestWrapper
                                 where TResponse : class, new()
         {
             CreateRequest(parameters, urlSegments, headers, objectForUri, objectForBody, objectForJsonBody);
-            TResponse response = Execute<TResponse>().Data;
+            TResponse response = JsonConvert.DeserializeObject<TResponse>(Execute<TResponse>().Content);
             return response;
         }
 
