@@ -227,7 +227,8 @@ namespace RestWrapper
 
             if (objectForJsonBody != null)
             {
-                request.AddJsonBody(JsonConvert.SerializeObject(objectForJsonBody));
+                request.AddParameter("application/json; charset=utf-8", JsonConvert.SerializeObject(objectForJsonBody), ParameterType.RequestBody);
+                request.RequestFormat = DataFormat.Json;
             }
         }
 
